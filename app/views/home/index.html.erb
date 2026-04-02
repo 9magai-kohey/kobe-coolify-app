@@ -1,0 +1,192 @@
+<% content_for(:title, "Coolify First App - Self-Hosted PaaS テストアプリ") %>
+
+<!-- Hero Section -->
+<div class="bg-dark text-white py-5">
+  <div class="container py-4">
+    <div class="row align-items-center">
+      <div class="col-lg-8">
+        <h1 class="display-4 fw-bold mb-3">
+          <i class="bi bi-rocket-takeoff me-2"></i>Coolify First App
+        </h1>
+        <p class="lead mb-4">
+          自宅 Linux NUC (kobe-nuc) を Coolify ベースの self-hosted PaaS にして、
+          Rails アプリを Heroku 的にデプロイするテストアプリケーションです。
+        </p>
+        <div class="d-flex flex-wrap gap-2">
+          <span class="badge bg-primary fs-6"><i class="bi bi-gem me-1"></i>Rails 8</span>
+          <span class="badge bg-success fs-6"><i class="bi bi-database me-1"></i>PostgreSQL</span>
+          <span class="badge bg-info fs-6"><i class="bi bi-box-seam me-1"></i>Docker</span>
+          <span class="badge bg-warning text-dark fs-6"><i class="bi bi-cloud me-1"></i>Coolify</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- System Overview -->
+<div class="container py-5">
+  <h2 class="mb-4"><i class="bi bi-diagram-3 me-2"></i>システム構成</h2>
+  <div class="row g-4">
+    <div class="col-md-6 col-lg-3">
+      <div class="card h-100 border-primary">
+        <div class="card-body text-center">
+          <i class="bi bi-pc-display fs-1 text-primary"></i>
+          <h5 class="card-title mt-3">kobe-nuc</h5>
+          <p class="card-text text-muted">
+            Ubuntu 24.04 LTS<br>
+            2コア / 7.3GB RAM<br>
+            IP: 192.168.11.52
+          </p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6 col-lg-3">
+      <div class="card h-100 border-warning">
+        <div class="card-body text-center">
+          <i class="bi bi-cloud-arrow-up fs-1 text-warning"></i>
+          <h5 class="card-title mt-3">Coolify</h5>
+          <p class="card-text text-muted">
+            Self-hosted PaaS<br>
+            ダッシュボード :8000<br>
+            Git デプロイ対応
+          </p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6 col-lg-3">
+      <div class="card h-100 border-info">
+        <div class="card-body text-center">
+          <i class="bi bi-box-seam fs-1 text-info"></i>
+          <h5 class="card-title mt-3">Docker</h5>
+          <p class="card-text text-muted">
+            コンテナランタイム<br>
+            Dockerfile ビルド<br>
+            Thruster + Puma
+          </p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6 col-lg-3">
+      <div class="card h-100 border-success">
+        <div class="card-body text-center">
+          <i class="bi bi-database fs-1 text-success"></i>
+          <h5 class="card-title mt-3">PostgreSQL</h5>
+          <p class="card-text text-muted">
+            Coolify マネージド<br>
+            永続ボリューム<br>
+            Solid Cache/Queue
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Deploy Steps -->
+<div class="bg-light py-5">
+  <div class="container">
+    <h2 class="mb-4"><i class="bi bi-list-ol me-2"></i>デプロイ手順</h2>
+    <div class="row g-4">
+      <div class="col-lg-6">
+        <div class="list-group">
+          <div class="list-group-item">
+            <div class="d-flex align-items-center">
+              <span class="badge bg-dark rounded-pill me-3 fs-6">1</span>
+              <div>
+                <h6 class="mb-1">Docker インストール</h6>
+                <small class="text-muted">公式スクリプトで Docker Engine をセットアップ</small>
+              </div>
+            </div>
+          </div>
+          <div class="list-group-item">
+            <div class="d-flex align-items-center">
+              <span class="badge bg-dark rounded-pill me-3 fs-6">2</span>
+              <div>
+                <h6 class="mb-1">Coolify インストール</h6>
+                <small class="text-muted">ワンライナーで PaaS 環境を構築</small>
+              </div>
+            </div>
+          </div>
+          <div class="list-group-item">
+            <div class="d-flex align-items-center">
+              <span class="badge bg-dark rounded-pill me-3 fs-6">3</span>
+              <div>
+                <h6 class="mb-1">PostgreSQL 作成</h6>
+                <small class="text-muted">Coolify ダッシュボードから DB リソースを追加</small>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-6">
+        <div class="list-group">
+          <div class="list-group-item">
+            <div class="d-flex align-items-center">
+              <span class="badge bg-dark rounded-pill me-3 fs-6">4</span>
+              <div>
+                <h6 class="mb-1">Rails アプリのデプロイ</h6>
+                <small class="text-muted">Git URL + Dockerfile ビルドで自動デプロイ</small>
+              </div>
+            </div>
+          </div>
+          <div class="list-group-item">
+            <div class="d-flex align-items-center">
+              <span class="badge bg-dark rounded-pill me-3 fs-6">5</span>
+              <div>
+                <h6 class="mb-1">動作確認</h6>
+                <small class="text-muted">ブラウザアクセス + マイグレーション確認</small>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MVP Scope -->
+<div class="container py-5">
+  <div class="row g-4">
+    <div class="col-md-6">
+      <div class="card border-success h-100">
+        <div class="card-header bg-success text-white">
+          <i class="bi bi-check-circle me-2"></i>MVP スコープ (LAN 内運用)
+        </div>
+        <div class="card-body">
+          <ul class="list-unstyled mb-0">
+            <li class="mb-2"><i class="bi bi-check2 text-success me-2"></i>Coolify でコンテナ管理</li>
+            <li class="mb-2"><i class="bi bi-check2 text-success me-2"></i>Dockerfile ベースのビルド</li>
+            <li class="mb-2"><i class="bi bi-check2 text-success me-2"></i>PostgreSQL (マネージド)</li>
+            <li class="mb-2"><i class="bi bi-check2 text-success me-2"></i>手動 Git デプロイ</li>
+            <li class="mb-2"><i class="bi bi-check2 text-success me-2"></i>LAN 内アクセス</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="card border-secondary h-100">
+        <div class="card-header bg-secondary text-white">
+          <i class="bi bi-clock me-2"></i>後回し (MVP 後)
+        </div>
+        <div class="card-body">
+          <ul class="list-unstyled mb-0">
+            <li class="mb-2"><i class="bi bi-dash text-muted me-2"></i>外部公開 (DDNS / 独自ドメイン)</li>
+            <li class="mb-2"><i class="bi bi-dash text-muted me-2"></i>SSL (Let's Encrypt)</li>
+            <li class="mb-2"><i class="bi bi-dash text-muted me-2"></i>GitHub App 連携・自動デプロイ</li>
+            <li class="mb-2"><i class="bi bi-dash text-muted me-2"></i>DB バックアップスケジュール</li>
+            <li class="mb-2"><i class="bi bi-dash text-muted me-2"></i>外形監視</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Footer -->
+<div class="bg-dark text-white py-3">
+  <div class="container text-center">
+    <small class="text-muted">
+      <i class="bi bi-house me-1"></i>kobe-nuc Self-Hosted PaaS
+    </small>
+  </div>
+</div>
