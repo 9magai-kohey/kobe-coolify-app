@@ -81,7 +81,9 @@ test:
 production:
   primary: &primary_production
     <<: *default
-    url: <%= ENV["DATABASE_URL"] %>
+    database: coolify_first_app_production
+    username: coolify_first_app
+    password: <%= ENV["COOLIFY_FIRST_APP_DATABASE_PASSWORD"] %>
   cache:
     <<: *primary_production
     database: coolify_first_app_production_cache
