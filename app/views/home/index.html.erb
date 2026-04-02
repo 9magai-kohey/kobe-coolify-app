@@ -1,192 +1,678 @@
-<% content_for(:title, "Coolify First App - Self-Hosted PaaS テストアプリ") %>
+<% content_for(:title, "KobeCoolify 開発者デプロイガイド") %>
 
 <!-- Hero Section -->
 <div class="bg-dark text-white py-5">
   <div class="container py-4">
-    <div class="row align-items-center">
-      <div class="col-lg-8">
-        <h1 class="display-4 fw-bold mb-3">
-          <i class="bi bi-rocket-takeoff me-2"></i>Coolify First App
-        </h1>
-        <p class="lead mb-4">
-          自宅 Linux NUC (kobe-nuc) を Coolify ベースの self-hosted PaaS にして、
-          Rails アプリを Heroku 的にデプロイするテストアプリケーションです。
-        </p>
-        <div class="d-flex flex-wrap gap-2">
-          <span class="badge bg-primary fs-6"><i class="bi bi-gem me-1"></i>Rails 8</span>
-          <span class="badge bg-success fs-6"><i class="bi bi-database me-1"></i>PostgreSQL</span>
-          <span class="badge bg-info fs-6"><i class="bi bi-box-seam me-1"></i>Docker</span>
-          <span class="badge bg-warning text-dark fs-6"><i class="bi bi-cloud me-1"></i>Coolify</span>
-        </div>
-      </div>
-    </div>
+    <h1 class="display-4 fw-bold mb-3">
+      <i class="bi bi-rocket-takeoff me-2"></i>KobeCoolify 開発者デプロイガイド
+    </h1>
+    <p class="lead mb-4">
+      KobeCoolify を使って Rails アプリをデプロイする方法。
+    </p>
   </div>
 </div>
 
-<!-- System Overview -->
+<!-- 1. KobeCoolify とは -->
 <div class="container py-5">
-  <h2 class="mb-4"><i class="bi bi-diagram-3 me-2"></i>システム構成</h2>
-  <div class="row g-4">
-    <div class="col-md-6 col-lg-3">
-      <div class="card h-100 border-primary">
-        <div class="card-body text-center">
-          <i class="bi bi-pc-display fs-1 text-primary"></i>
-          <h5 class="card-title mt-3">kobe-nuc</h5>
-          <p class="card-text text-muted">
-            Ubuntu 24.04 LTS<br>
-            2コア / 7.3GB RAM<br>
-            IP: 192.168.11.52
-          </p>
-        </div>
-      </div>
-    </div>
-    <div class="col-md-6 col-lg-3">
-      <div class="card h-100 border-warning">
-        <div class="card-body text-center">
-          <i class="bi bi-cloud-arrow-up fs-1 text-warning"></i>
-          <h5 class="card-title mt-3">Coolify</h5>
-          <p class="card-text text-muted">
-            Self-hosted PaaS<br>
-            ダッシュボード :8000<br>
-            Git デプロイ対応
-          </p>
-        </div>
-      </div>
-    </div>
-    <div class="col-md-6 col-lg-3">
-      <div class="card h-100 border-info">
-        <div class="card-body text-center">
-          <i class="bi bi-box-seam fs-1 text-info"></i>
-          <h5 class="card-title mt-3">Docker</h5>
-          <p class="card-text text-muted">
-            コンテナランタイム<br>
-            Dockerfile ビルド<br>
-            Thruster + Puma
-          </p>
-        </div>
-      </div>
-    </div>
-    <div class="col-md-6 col-lg-3">
-      <div class="card h-100 border-success">
-        <div class="card-body text-center">
-          <i class="bi bi-database fs-1 text-success"></i>
-          <h5 class="card-title mt-3">PostgreSQL</h5>
-          <p class="card-text text-muted">
-            Coolify マネージド<br>
-            永続ボリューム<br>
-            Solid Cache/Queue
-          </p>
-        </div>
-      </div>
-    </div>
-  </div>
+  <h2 class="mb-4"><i class="bi bi-info-circle me-2"></i>1. KobeCoolify とは</h2>
+  <p>
+    KobeCoolify は自社ホスティングの PaaS 環境です。Heroku のように Web UI からアプリをデプロイでき、HTTPS での外部公開まで自動で行われます。
+  </p>
+  <table class="table table-bordered">
+    <tbody>
+      <tr>
+        <th class="table-light" style="width: 200px;">ダッシュボード URL</th>
+        <td><code>https://admin.sg-kobe.org</code></td>
+      </tr>
+      <tr>
+        <th class="table-light">アプリ公開ドメイン</th>
+        <td><code>*.sg-kobe.org</code></td>
+      </tr>
+      <tr>
+        <th class="table-light">SSL</th>
+        <td>Cloudflare が自動提供（設定不要）</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5>ログイン</h5>
+  <p>管理者から招待リンクを受け取り、アカウントを作成してください。</p>
 </div>
 
-<!-- Deploy Steps -->
-<div class="bg-light py-5">
-  <div class="container">
-    <h2 class="mb-4"><i class="bi bi-list-ol me-2"></i>デプロイ手順</h2>
-    <div class="row g-4">
-      <div class="col-lg-6">
-        <div class="list-group">
-          <div class="list-group-item">
-            <div class="d-flex align-items-center">
-              <span class="badge bg-dark rounded-pill me-3 fs-6">1</span>
-              <div>
-                <h6 class="mb-1">Docker インストール</h6>
-                <small class="text-muted">公式スクリプトで Docker Engine をセットアップ</small>
-              </div>
-            </div>
-          </div>
-          <div class="list-group-item">
-            <div class="d-flex align-items-center">
-              <span class="badge bg-dark rounded-pill me-3 fs-6">2</span>
-              <div>
-                <h6 class="mb-1">Coolify インストール</h6>
-                <small class="text-muted">ワンライナーで PaaS 環境を構築</small>
-              </div>
-            </div>
-          </div>
-          <div class="list-group-item">
-            <div class="d-flex align-items-center">
-              <span class="badge bg-dark rounded-pill me-3 fs-6">3</span>
-              <div>
-                <h6 class="mb-1">PostgreSQL 作成</h6>
-                <small class="text-muted">Coolify ダッシュボードから DB リソースを追加</small>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="col-lg-6">
-        <div class="list-group">
-          <div class="list-group-item">
-            <div class="d-flex align-items-center">
-              <span class="badge bg-dark rounded-pill me-3 fs-6">4</span>
-              <div>
-                <h6 class="mb-1">Rails アプリのデプロイ</h6>
-                <small class="text-muted">Git URL + Dockerfile ビルドで自動デプロイ</small>
-              </div>
-            </div>
-          </div>
-          <div class="list-group-item">
-            <div class="d-flex align-items-center">
-              <span class="badge bg-dark rounded-pill me-3 fs-6">5</span>
-              <div>
-                <h6 class="mb-1">動作確認</h6>
-                <small class="text-muted">ブラウザアクセス + マイグレーション確認</small>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
+<hr class="container">
 
-<!-- MVP Scope -->
+<!-- 2. デプロイ手順 -->
 <div class="container py-5">
-  <div class="row g-4">
-    <div class="col-md-6">
-      <div class="card border-success h-100">
-        <div class="card-header bg-success text-white">
-          <i class="bi bi-check-circle me-2"></i>MVP スコープ (LAN 内運用)
-        </div>
-        <div class="card-body">
-          <ul class="list-unstyled mb-0">
-            <li class="mb-2"><i class="bi bi-check2 text-success me-2"></i>Coolify でコンテナ管理</li>
-            <li class="mb-2"><i class="bi bi-check2 text-success me-2"></i>Dockerfile ベースのビルド</li>
-            <li class="mb-2"><i class="bi bi-check2 text-success me-2"></i>PostgreSQL (マネージド)</li>
-            <li class="mb-2"><i class="bi bi-check2 text-success me-2"></i>手動 Git デプロイ</li>
-            <li class="mb-2"><i class="bi bi-check2 text-success me-2"></i>LAN 内アクセス</li>
+  <h2 class="mb-4"><i class="bi bi-list-ol me-2"></i>2. デプロイ手順（ステップバイステップ）</h2>
+  <div class="accordion" id="deploySteps">
+
+    <!-- Step 1 -->
+    <div class="accordion-item">
+      <h2 class="accordion-header">
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#step1">
+          <span class="badge bg-dark rounded-pill me-3">1</span> アプリのコードを準備
+        </button>
+      </h2>
+      <div id="step1" class="accordion-collapse collapse" data-bs-parent="#deploySteps">
+        <div class="accordion-body">
+          <ul>
+            <li>GitHub にリポジトリを作成（Public）</li>
+            <li><code>Dockerfile</code> がリポジトリに含まれていることを確認（Rails 7.1+ は <code>rails new</code> で自動生成）</li>
           </ul>
         </div>
       </div>
     </div>
-    <div class="col-md-6">
-      <div class="card border-secondary h-100">
-        <div class="card-header bg-secondary text-white">
-          <i class="bi bi-clock me-2"></i>後回し (MVP 後)
+
+    <!-- Step 2 -->
+    <div class="accordion-item">
+      <h2 class="accordion-header">
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#step2">
+          <span class="badge bg-dark rounded-pill me-3">2</span> PostgreSQL を作成
+        </button>
+      </h2>
+      <div id="step2" class="accordion-collapse collapse" data-bs-parent="#deploySteps">
+        <div class="accordion-body">
+          <ol>
+            <li>ダッシュボードにログイン</li>
+            <li><strong>Projects</strong> → 自分のプロジェクトを選択</li>
+            <li><strong>+ Add Resource</strong> → <strong>Database</strong> → <strong>PostgreSQL</strong></li>
+            <li>デフォルト設定のまま <strong>Start</strong></li>
+            <li><strong>Postgres URL (internal)</strong> を確認し、ホスト名をメモ</li>
+          </ol>
+<pre class="bg-dark text-light p-3 rounded"><code>例: postgres://postgres:xxxxx@lhczjgtz4rl86ktfbyh2qy4f:5432/postgres
+                                 ↑ これがホスト名</code></pre>
         </div>
+      </div>
+    </div>
+
+    <!-- Step 3 -->
+    <div class="accordion-item">
+      <h2 class="accordion-header">
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#step3">
+          <span class="badge bg-dark rounded-pill me-3">3</span> アプリを登録
+        </button>
+      </h2>
+      <div id="step3" class="accordion-collapse collapse" data-bs-parent="#deploySteps">
+        <div class="accordion-body">
+          <ol>
+            <li><strong>+ Add Resource</strong> → <strong>Application</strong> → <strong>Public Repository</strong></li>
+            <li>Git URL を入力（例: <code>https://github.com/yourname/yourapp.git</code>）</li>
+            <li>Build Pack: <strong>Dockerfile</strong> を選択</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 4 -->
+    <div class="accordion-item">
+      <h2 class="accordion-header">
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#step4">
+          <span class="badge bg-dark rounded-pill me-3">4</span> 環境変数を設定
+        </button>
+      </h2>
+      <div id="step4" class="accordion-collapse collapse" data-bs-parent="#deploySteps">
+        <div class="accordion-body">
+          <p>アプリの <strong>Environment Variables</strong> で以下を設定：</p>
+          <table class="table table-bordered">
+            <thead class="table-light">
+              <tr><th>変数名</th><th>値</th><th>必須</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><code>RAILS_MASTER_KEY</code></td><td><code>config/master.key</code> の中身</td><td>必須</td></tr>
+              <tr><td><code>DATABASE_URL</code></td><td>PostgreSQL の接続 URL</td><td>必須</td></tr>
+            </tbody>
+          </table>
+          <p><code>DATABASE_URL</code> は、Step 2 で確認した <strong>Postgres URL (internal)</strong> をそのまま設定します：</p>
+<pre class="bg-dark text-light p-3 rounded"><code>postgres://postgres:パスワード@ホスト名:5432/postgres</code></pre>
+          <div class="alert alert-warning">
+            <i class="bi bi-exclamation-triangle me-1"></i>
+            <strong>重要</strong>: <code>Available at Runtime</code> がオンになっていることを確認してください。
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 5 -->
+    <div class="accordion-item">
+      <h2 class="accordion-header">
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#step5">
+          <span class="badge bg-dark rounded-pill me-3">5</span> ドメインを設定
+        </button>
+      </h2>
+      <div id="step5" class="accordion-collapse collapse" data-bs-parent="#deploySteps">
+        <div class="accordion-body">
+          <p>アプリの <strong>Configuration</strong> → <strong>General</strong> → <strong>Domains</strong> に以下を入力：</p>
+<pre class="bg-dark text-light p-3 rounded"><code>http://yourapp.sg-kobe.org</code></pre>
+          <div class="alert alert-danger">
+            <i class="bi bi-exclamation-octagon me-1"></i>
+            <strong><code>http://</code> で設定すること。</strong>
+            <code>https://</code> にするとリダイレクトループが発生します。SSL は Cloudflare が自動で提供するため、Coolify 側は <code>http://</code> で問題ありません。
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 6 -->
+    <div class="accordion-item">
+      <h2 class="accordion-header">
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#step6">
+          <span class="badge bg-dark rounded-pill me-3">6</span> デプロイ
+        </button>
+      </h2>
+      <div id="step6" class="accordion-collapse collapse" data-bs-parent="#deploySteps">
+        <div class="accordion-body">
+          <p><strong>Deploy</strong> ボタンをクリック。ビルドログでエラーがないか確認してください。</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 7 -->
+    <div class="accordion-item">
+      <h2 class="accordion-header">
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#step7">
+          <span class="badge bg-dark rounded-pill me-3">7</span> 動作確認
+        </button>
+      </h2>
+      <div id="step7" class="accordion-collapse collapse" data-bs-parent="#deploySteps">
+        <div class="accordion-body">
+          <p>ブラウザで <code>https://yourapp.sg-kobe.org</code> にアクセス。</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<hr class="container">
+
+<!-- 3. database.yml の設定 -->
+<div class="container py-5">
+  <h2 class="mb-4"><i class="bi bi-database me-2"></i>3. database.yml の設定</h2>
+
+  <div class="card mb-4">
+    <div class="card-header"><strong>必須: <code>url</code> で接続する</strong></div>
+    <div class="card-body">
+      <p>Coolify では Rails と PostgreSQL が <strong>別々の Docker コンテナ</strong> で動きます。<code>database.yml</code> を <code>DATABASE_URL</code> 環境変数から接続情報を読み取る形に変更してください。</p>
+<pre class="bg-dark text-light p-3 rounded"><code># config/database.yml
+production:
+  primary: &amp;primary_production
+    &lt;&lt;: *default
+    url: &lt;%= ENV["DATABASE_URL"] %&gt;</code></pre>
+      <p class="mt-3">これだけで、ホスト名・ユーザー名・パスワード・DB名がすべて <code>DATABASE_URL</code> から読み取られます。</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><strong>Rails 8 の multi-database 構成</strong></div>
+    <div class="card-body">
+      <p>Rails 8 では <code>rails new</code> で Solid Queue / Solid Cache / Solid Cable がデフォルト有効になり、<code>database.yml</code> に <code>primary</code>, <code>cache</code>, <code>queue</code>, <code>cable</code> の 4 つの DB が定義されます。</p>
+      <p><strong>全ての DB を <code>DATABASE_URL</code> 経由で接続する設定:</strong></p>
+<pre class="bg-dark text-light p-3 rounded"><code>production:
+  primary: &amp;primary_production
+    &lt;&lt;: *default
+    url: &lt;%= ENV["DATABASE_URL"] %&gt;
+  cache:
+    &lt;&lt;: *primary_production
+    database: myapp_production_cache
+    migrations_paths: db/cache_migrate
+  queue:
+    &lt;&lt;: *primary_production
+    database: myapp_production_queue
+    migrations_paths: db/queue_migrate
+  cable:
+    &lt;&lt;: *primary_production
+    database: myapp_production_cable
+    migrations_paths: db/cable_migrate</code></pre>
+      <p class="mt-3"><strong>ポイント</strong>: primary に <code>url:</code> を設定すると、ホスト名・ユーザー名・パスワードが YAML アンカー (<code>&amp;primary_production</code>) 経由で cache/queue/cable にも反映されます。各 DB の <code>database:</code> 行で DB 名だけを個別に指定しています。</p>
+      <div class="alert alert-info">
+        <i class="bi bi-lightbulb me-1"></i>
+        <strong>なぜ Heroku では設定変更が不要？</strong> Heroku は <code>DATABASE_URL</code> を自動設定し、デフォルトの <code>database.yml</code> は single-database 構成のため <code>DATABASE_URL</code> だけで動く。Coolify でも <code>url:</code> を明示すれば同じように動く。
+      </div>
+    </div>
+  </div>
+</div>
+
+<hr class="container">
+
+<!-- 4. Dockerfile の注意点 -->
+<div class="container py-5">
+  <h2 class="mb-4"><i class="bi bi-file-earmark-code me-2"></i>4. Dockerfile の注意点</h2>
+
+  <div class="card mb-4">
+    <div class="card-header"><strong>SecretsUsedInArgOrEnv エラー</strong></div>
+    <div class="card-body">
+      <p>Rails 8 のデフォルト Dockerfile には <code># check=error=true</code> が含まれています。<code>RAILS_MASTER_KEY</code> を <code>ARG</code> で渡す場合、以下のエラーが出ます：</p>
+<pre class="bg-dark text-light p-3 rounded"><code>ERROR: failed to build: lint violation found for rules: SecretsUsedInArgOrEnv</code></pre>
+      <p class="mt-3"><strong>対処</strong>: Dockerfile の 2 行目を変更：</p>
+<pre class="bg-dark text-light p-3 rounded"><code># 変更前
+# check=error=true
+
+# 変更後
+# check=skip=SecretsUsedInArgOrEnv</code></pre>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><strong>ポート設定</strong></div>
+    <div class="card-body">
+      <p>Coolify は Dockerfile の <code>EXPOSE</code> を読み取りますが、アプリの設定画面で <strong>Ports</strong> を正しく設定してください：</p>
+      <ul>
+        <li>Thruster を使う場合: <strong>80</strong></li>
+        <li>Puma 直接の場合: <strong>3000</strong></li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<hr class="container">
+
+<!-- 5. 環境変数一覧 -->
+<div class="container py-5">
+  <h2 class="mb-4"><i class="bi bi-gear me-2"></i>5. 環境変数一覧</h2>
+
+  <h5>必須</h5>
+  <table class="table table-bordered mb-4">
+    <thead class="table-light">
+      <tr><th>変数名</th><th>説明</th><th>例</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>RAILS_MASTER_KEY</code></td>
+        <td><code>config/master.key</code> の中身（32文字の16進数）</td>
+        <td><code>abc123def456...</code></td>
+      </tr>
+      <tr>
+        <td><code>DATABASE_URL</code></td>
+        <td>Coolify の PostgreSQL 接続 URL (internal)</td>
+        <td><code>postgres://postgres:xxx@hostname:5432/postgres</code></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h5>よく使うもの</h5>
+  <table class="table table-bordered mb-4">
+    <thead class="table-light">
+      <tr><th>変数名</th><th>説明</th><th>デフォルト</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><code>RAILS_ENV</code></td><td>Rails 環境</td><td><code>production</code></td></tr>
+      <tr><td><code>RAILS_SERVE_STATIC_FILES</code></td><td>静的ファイルの配信</td><td><code>true</code></td></tr>
+    </tbody>
+  </table>
+
+  <h5>確認ポイント</h5>
+  <ul>
+    <li><strong>Available at Runtime</strong>: オンにする（ビルド時のみの変数と混同しない）</li>
+    <li><strong>Available at Buildtime</strong>: <code>RAILS_MASTER_KEY</code> はビルド時にも必要な場合がある（アセットプリコンパイル）</li>
+    <li><strong>DATABASE_URL</strong>: Coolify の PostgreSQL 設定画面 → <strong>Postgres URL (internal)</strong> の値をそのままコピーして使う</li>
+  </ul>
+</div>
+
+<hr class="container">
+
+<!-- 6. ドメイン設定 -->
+<div class="container py-5">
+  <h2 class="mb-4"><i class="bi bi-globe me-2"></i>6. ドメイン設定</h2>
+
+  <div class="card mb-4">
+    <div class="card-header"><strong>基本ルール</strong></div>
+    <div class="card-body">
+      <ul>
+        <li>ドメインは <code>http://yourapp.sg-kobe.org</code> の形式で設定</li>
+        <li><strong>必ず <code>http://</code> で設定</strong>（<code>https://</code> ではない）</li>
+        <li>SSL は Cloudflare が自動提供（設定不要）</li>
+        <li>ワイルドカード DNS が設定済みなので、任意のサブドメインが使える</li>
+      </ul>
+    </div>
+  </div>
+
+  <h5>使えるドメイン例</h5>
+<pre class="bg-dark text-light p-3 rounded mb-4"><code>http://myapp.sg-kobe.org
+http://staging-myapp.sg-kobe.org
+http://api.sg-kobe.org</code></pre>
+
+  <h5>ドメインの重複</h5>
+  <p>同じドメインを複数のアプリに設定することはできません（Coolify がエラーを返します）。</p>
+</div>
+
+<hr class="container">
+
+<!-- 7. デプロイ後の確認 -->
+<div class="container py-5">
+  <h2 class="mb-4"><i class="bi bi-check2-square me-2"></i>7. デプロイ後の確認</h2>
+
+  <div class="card mb-4">
+    <div class="card-header"><strong>チェックリスト</strong></div>
+    <div class="card-body">
+      <ul class="list-unstyled mb-0">
+        <li class="mb-2"><i class="bi bi-square me-2"></i><code>https://yourapp.sg-kobe.org</code> にアクセスできるか</li>
+        <li class="mb-2"><i class="bi bi-square me-2"></i>ログにエラーがないか（Coolify ダッシュボード → アプリ → <strong>Logs</strong>）</li>
+        <li class="mb-2"><i class="bi bi-square me-2"></i>DB マイグレーションが完了しているか</li>
+        <li class="mb-2"><i class="bi bi-square me-2"></i>環境変数が正しく設定されているか</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card mb-4">
+    <div class="card-header"><strong>ログの確認方法</strong></div>
+    <div class="card-body">
+      <ol>
+        <li>Coolify ダッシュボード → アプリを選択</li>
+        <li><strong>Logs</strong> タブをクリック</li>
+        <li>コンテナログがリアルタイムで表示される</li>
+      </ol>
+    </div>
+  </div>
+
+  <h5>再デプロイ</h5>
+  <p>コードを変更した場合は、GitHub に push した後、Coolify ダッシュボードで <strong>Deploy</strong> ボタンをクリック。</p>
+</div>
+
+<hr class="container">
+
+<!-- 8. ターミナルの利用 -->
+<div class="container py-5">
+  <h2 class="mb-4"><i class="bi bi-terminal me-2"></i>8. ターミナルの利用</h2>
+
+  <div class="card mb-4">
+    <div class="card-header"><strong>概要</strong></div>
+    <div class="card-body">
+      <p>Coolify のターミナル機能を使うと、ブラウザから直接サーバーやコンテナにシェル接続できます。SSH なしでコマンドを実行できるため、デバッグやマイグレーションの手動実行に便利です。</p>
+    </div>
+  </div>
+
+  <div class="card mb-4">
+    <div class="card-header"><strong>アクセス方法</strong></div>
+    <div class="card-body">
+      <ol>
+        <li>Coolify ダッシュボード (<code>https://admin.sg-kobe.org</code>) にログイン</li>
+        <li>左メニューの <strong>Terminal</strong> をクリック、または直接 <code>https://admin.sg-kobe.org/terminal</code> にアクセス</li>
+        <li>接続先のサーバーを選択</li>
+        <li>必要に応じてコンテナを選択</li>
+      </ol>
+    </div>
+  </div>
+
+  <div class="card mb-4">
+    <div class="card-header"><strong>できること</strong></div>
+    <div class="card-body">
+      <ul>
+        <li><strong>サーバーに接続</strong>: ホストマシンのシェルにアクセス</li>
+        <li><strong>コンテナに接続</strong>: 特定の Docker コンテナ内でコマンドを実行</li>
+      </ul>
+    </div>
+  </div>
+
+  <h5>使用例</h5>
+  <div class="row g-3 mb-4">
+    <div class="col-md-6">
+      <div class="card h-100">
         <div class="card-body">
-          <ul class="list-unstyled mb-0">
-            <li class="mb-2"><i class="bi bi-dash text-muted me-2"></i>外部公開 (DDNS / 独自ドメイン)</li>
-            <li class="mb-2"><i class="bi bi-dash text-muted me-2"></i>SSL (Let's Encrypt)</li>
-            <li class="mb-2"><i class="bi bi-dash text-muted me-2"></i>GitHub App 連携・自動デプロイ</li>
-            <li class="mb-2"><i class="bi bi-dash text-muted me-2"></i>DB バックアップスケジュール</li>
-            <li class="mb-2"><i class="bi bi-dash text-muted me-2"></i>外形監視</li>
-          </ul>
+          <h6>Rails コンソールを開く</h6>
+<pre class="bg-dark text-light p-3 rounded"><code>bin/rails console</code></pre>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="card h-100">
+        <div class="card-body">
+          <h6>DB マイグレーションを手動実行</h6>
+<pre class="bg-dark text-light p-3 rounded"><code>bin/rails db:migrate</code></pre>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="card h-100">
+        <div class="card-body">
+          <h6>ログを確認</h6>
+<pre class="bg-dark text-light p-3 rounded"><code>tail -f log/production.log</code></pre>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="card h-100">
+        <div class="card-body">
+          <h6>DB の状態を確認</h6>
+<pre class="bg-dark text-light p-3 rounded"><code>bin/rails db:version</code></pre>
         </div>
       </div>
     </div>
   </div>
+
+  <div class="alert alert-warning">
+    <i class="bi bi-exclamation-triangle me-1"></i>
+    <strong>注意事項</strong>
+    <ul class="mb-0 mt-2">
+      <li>ターミナルはブラウザ上で動作するため、長時間の接続は切断される場合があります</li>
+      <li>本番環境のデータを直接操作できるため、<strong>慎重に使用</strong>してください</li>
+      <li>ターミナルは <strong>外部アクセス (<code>https://admin.sg-kobe.org/terminal</code>)</strong> と <strong>LAN 内アクセス (<code>http://192.168.11.52:8000/terminal</code>)</strong> の両方から利用できます</li>
+    </ul>
+  </div>
+</div>
+
+<hr class="container">
+
+<!-- 9. トラブルシューティング -->
+<div class="container py-5">
+  <h2 class="mb-4"><i class="bi bi-wrench me-2"></i>9. トラブルシューティング</h2>
+  <div class="accordion" id="troubleshooting">
+
+    <div class="accordion-item">
+      <h2 class="accordion-header">
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#ts1">
+          DB 接続エラー: "No such file or directory"
+        </button>
+      </h2>
+      <div id="ts1" class="accordion-collapse collapse" data-bs-parent="#troubleshooting">
+        <div class="accordion-body">
+<pre class="bg-dark text-light p-3 rounded"><code>connection to server on socket "/var/run/postgresql/.s.PGSQL.5432" failed: No such file or directory</code></pre>
+          <p class="mt-3"><strong>原因</strong>: <code>database.yml</code> に接続先ホストが指定されていない。Rails がデフォルトの Unix ソケット接続を試みている。</p>
+          <p><strong>対処</strong>: セクション 3 を参照して <code>database.yml</code> の production に <code>url: &lt;%= ENV["DATABASE_URL"] %&gt;</code> を追加し、環境変数 <code>DATABASE_URL</code> を設定。</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="accordion-item">
+      <h2 class="accordion-header">
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#ts2">
+          DB 接続エラー: "could not translate host name"
+        </button>
+      </h2>
+      <div id="ts2" class="accordion-collapse collapse" data-bs-parent="#troubleshooting">
+        <div class="accordion-body">
+<pre class="bg-dark text-light p-3 rounded"><code>could not translate host name "xxxxx" to address: Temporary failure in name resolution</code></pre>
+          <p class="mt-3"><strong>原因</strong>: <code>DATABASE_URL</code> に間違ったホスト名が含まれている。</p>
+          <p><strong>対処</strong>: Coolify で作成した <strong>自分のアプリ用の</strong> PostgreSQL の <strong>Postgres URL (internal)</strong> を確認し、<code>DATABASE_URL</code> を正しい値に修正。</p>
+          <div class="alert alert-warning mt-3">
+            <i class="bi bi-exclamation-triangle me-1"></i>
+            <strong>注意</strong>: 他のアプリの PostgreSQL URL を使わないこと。各アプリごとに PostgreSQL を作成し、対応する URL を使用。
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="accordion-item">
+      <h2 class="accordion-header">
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#ts3">
+          DB 接続エラー: "no password supplied"
+        </button>
+      </h2>
+      <div id="ts3" class="accordion-collapse collapse" data-bs-parent="#troubleshooting">
+        <div class="accordion-body">
+<pre class="bg-dark text-light p-3 rounded"><code>fe_sendauth: no password supplied</code></pre>
+          <p class="mt-3"><strong>原因</strong>: <code>database.yml</code> が <code>DATABASE_URL</code> からではなく、個別の <code>password</code> 環境変数（例: <code>COOLIFY_FIRST_APP_DATABASE_PASSWORD</code>）を参照しているが、その変数が設定されていない。</p>
+          <p><strong>対処</strong>: <code>database.yml</code> を <code>url: &lt;%= ENV["DATABASE_URL"] %&gt;</code> 方式に変更する（セクション 3 参照）。URL にホスト名・ユーザー名・パスワードがすべて含まれるため、個別の変数設定が不要になる。</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="accordion-item">
+      <h2 class="accordion-header">
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#ts4">
+          ビルドエラー: "SecretsUsedInArgOrEnv"
+        </button>
+      </h2>
+      <div id="ts4" class="accordion-collapse collapse" data-bs-parent="#troubleshooting">
+        <div class="accordion-body">
+          <p><strong>対処</strong>: セクション 4 を参照して Dockerfile を修正。</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="accordion-item">
+      <h2 class="accordion-header">
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#ts5">
+          HTTPS リダイレクトループ
+        </button>
+      </h2>
+      <div id="ts5" class="accordion-collapse collapse" data-bs-parent="#troubleshooting">
+        <div class="accordion-body">
+          <p><strong>原因</strong>: ドメインを <code>https://</code> で設定した。</p>
+          <p><strong>対処</strong>: <code>http://</code> に変更。</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="accordion-item">
+      <h2 class="accordion-header">
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#ts6">
+          デプロイが途中で止まる
+        </button>
+      </h2>
+      <div id="ts6" class="accordion-collapse collapse" data-bs-parent="#troubleshooting">
+        <div class="accordion-body">
+          <p><strong>原因</strong>: 初回ビルドは Docker イメージの作成に時間がかかる（10〜20分）。2回目以降はキャッシュが効いて速くなる。</p>
+          <p><strong>対処</strong>: ビルドログの <strong>Show Debug Logs</strong> で進捗を確認。</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="accordion-item">
+      <h2 class="accordion-header">
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#ts7">
+          master.key エラー: "key must be 16 bytes"
+        </button>
+      </h2>
+      <div id="ts7" class="accordion-collapse collapse" data-bs-parent="#troubleshooting">
+        <div class="accordion-body">
+          <p><strong>原因</strong>: <code>RAILS_MASTER_KEY</code> が正しく設定されていない。</p>
+          <p><strong>対処</strong>: <code>config/master.key</code> の中身（改行なし、空白なし）をそのまま環境変数に設定。</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<hr class="container">
+
+<!-- 10. よくある質問 -->
+<div class="container py-5">
+  <h2 class="mb-4"><i class="bi bi-question-circle me-2"></i>10. よくある質問</h2>
+  <div class="accordion" id="faq">
+
+    <div class="accordion-item">
+      <h2 class="accordion-header">
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
+          Q: Private リポジトリは使えますか？
+        </button>
+      </h2>
+      <div id="faq1" class="accordion-collapse collapse" data-bs-parent="#faq">
+        <div class="accordion-body">
+          GitHub App を設定すれば Private リポジトリも使えます。管理者に相談してください。現在は Public リポジトリのみ簡単にデプロイできます。
+        </div>
+      </div>
+    </div>
+
+    <div class="accordion-item">
+      <h2 class="accordion-header">
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
+          Q: 自動デプロイ（push 時の自動デプロイ）はできますか？
+        </button>
+      </h2>
+      <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faq">
+        <div class="accordion-body">
+          GitHub App を設定すれば可能です。現在は手動で <strong>Deploy</strong> ボタンを押す運用です。
+        </div>
+      </div>
+    </div>
+
+    <div class="accordion-item">
+      <h2 class="accordion-header">
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">
+          Q: 複数の環境（staging / production）を作れますか？
+        </button>
+      </h2>
+      <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faq">
+        <div class="accordion-body">
+          はい。Coolify のプロジェクト内に複数の Environment を作成し、それぞれに別のドメイン（例: <code>staging-myapp.sg-kobe.org</code>）を設定できます。
+        </div>
+      </div>
+    </div>
+
+    <div class="accordion-item">
+      <h2 class="accordion-header">
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq4">
+          Q: DB のバックアップはありますか？
+        </button>
+      </h2>
+      <div id="faq4" class="accordion-collapse collapse" data-bs-parent="#faq">
+        <div class="accordion-body">
+          Coolify の PostgreSQL 設定画面からバックアップのスケジュールを設定できます。管理者に確認してください。
+        </div>
+      </div>
+    </div>
+
+    <div class="accordion-item">
+      <h2 class="accordion-header">
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq5">
+          Q: アプリのログはどこで見れますか？
+        </button>
+      </h2>
+      <div id="faq5" class="accordion-collapse collapse" data-bs-parent="#faq">
+        <div class="accordion-body">
+          Coolify ダッシュボード → アプリ → <strong>Logs</strong> タブでリアルタイムで確認できます。
+        </div>
+      </div>
+    </div>
+
+    <div class="accordion-item">
+      <h2 class="accordion-header">
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq6">
+          Q: SSL 証明書の設定は必要ですか？
+        </button>
+      </h2>
+      <div id="faq6" class="accordion-collapse collapse" data-bs-parent="#faq">
+        <div class="accordion-body">
+          不要です。Cloudflare が自動で HTTPS を提供します。ドメインを <code>http://</code> で設定するだけで、ユーザーは <code>https://</code> でアクセスできます。
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<hr class="container">
+
+<!-- 11. デプロイチェックリスト -->
+<div class="container py-5">
+  <h2 class="mb-4"><i class="bi bi-clipboard-check me-2"></i>デプロイチェックリスト（コピー用）</h2>
+<pre class="bg-dark text-light p-4 rounded"><code>□ Dockerfile がリポジトリにある
+□ Dockerfile に # check=skip=SecretsUsedInArgOrEnv がある（必要な場合）
+□ database.yml の production に url: &lt;%= ENV["DATABASE_URL"] %&gt; がある
+□ PostgreSQL を Coolify で作成した（自分のアプリ用）
+□ 環境変数を設定した
+  □ RAILS_MASTER_KEY（config/master.key の中身）
+  □ DATABASE_URL（Postgres URL (internal) の値をコピー）
+□ ドメインを http://xxx.sg-kobe.org で設定した（https:// ではなく http://）
+□ Deploy ボタンを押した
+□ https://xxx.sg-kobe.org でアクセスできることを確認した</code></pre>
 </div>
 
 <!-- Footer -->
 <div class="bg-dark text-white py-3">
   <div class="container text-center">
     <small class="text-muted">
-      <i class="bi bi-house me-1"></i>kobe-nuc Self-Hosted PaaS
+      <i class="bi bi-cloud me-1"></i>KobeCoolify — Self-Hosted PaaS
     </small>
   </div>
 </div>
